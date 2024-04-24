@@ -3,16 +3,16 @@
 # YUUICHI ADVANCE RENAME 𝐁𝐎𝐓
 
 
-### Sᴀᴍᴩʟᴇ Bᴏᴛ (Official Sɪɢᴍᴀ Sɴᴏᴡ Bᴏᴛ)
+### Sᴀᴍᴩʟᴇ Bᴏᴛ (Official YUUICHI ADVANCE RENAME Bᴏᴛ)
 
 <p align="center">
-🤖 <a href="https://t.me/SigmaSnowBot"><img title="Telegram" src="https://img.shields.io/static/v1?label=SigmaSnow&message=BOT&color=blue-green"></a> 🤖
+🤖 <a href="https://t.me/VQ_RENAME_BOT"><img title="Telegram" src="https://img.shields.io/static/v1?label=SigmaSnow&message=BOT&color=blue-green"></a> 🤖
 </p>
 
 
 ## Deploy To Render              
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Snowball-0/Sigma-Snow-Bot)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/YuuichiSama/Yuuichi-RenameBot/tree/main)
 
 ## Deploy To Railway
 
