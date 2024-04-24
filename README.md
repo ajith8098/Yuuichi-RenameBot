@@ -1,6 +1,6 @@
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
-# 𝐒𝐈𝐆𝐌𝐀 𝐒𝐍𝐎𝐖 𝐁𝐎𝐓
+# YUUICHI ADVANCE RENAME 𝐁𝐎𝐓
 
 
 ### Sᴀᴍᴩʟᴇ Bᴏᴛ (Official Sɪɢᴍᴀ Sɴᴏᴡ Bᴏᴛ)
@@ -20,7 +20,7 @@
 
 ## Deploy To Heroku
 
-<a href="https://heroku.com/deploy?template=https://github.com/Snowball-0/Sigma-Snow-Bot"><img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"></a>
+<a href="https://heroku.com/deploy?template=https://github.com/YuuichiSama/Yuuichi-RenameBot/tree/main"><img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"></a>
 
 
 
