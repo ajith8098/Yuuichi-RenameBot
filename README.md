@@ -6,7 +6,7 @@
 ### Sᴀᴍᴩʟᴇ Bᴏᴛ (Official YUUICHI ADVANCE RENAME Bᴏᴛ)
 
 <p align="center">
-🤖 <a href="https://t.me/VQ_RENAME_BOT"><img title="Telegram" src="https://img.shields.io/static/v1?label=SigmaSnow&message=BOT&color=blue-green"></a> 🤖
+🤖 <a href="https://t.me/VQ_RENAME_BOT"><img title="Telegram" src="https://img.shields.io/static/v1?label=YUUICHIADVANCERENAME&message=BOT&color=blue-green"></a> 🤖
 </p>
 
 
@@ -73,4 +73,4 @@ broadcast - Send Message To All Users (Admin Only)
 ```
 
 ## Created By ❄️
-- `Snowball` 
+- `YUUICHI SAMA` 
