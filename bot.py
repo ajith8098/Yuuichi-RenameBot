@@ -17,7 +17,6 @@ logging.config.fileConfig('logging.conf')
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
-
 class Bot(Client):
 
     def __init__(self):
@@ -83,7 +82,7 @@ def main():
             await asyncio.gather(
                 bot_instance.start()
             )
-        
+
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_services())
     loop.run_forever()
@@ -91,4 +90,3 @@ def main():
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", message="There is no current event loop")
     main()
-
