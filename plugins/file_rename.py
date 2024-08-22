@@ -17,7 +17,6 @@ from config import Config
 app = Client("test", api_id=Config.STRING_API_ID,
              api_hash=Config.STRING_API_HASH, session_string=Config.STRING_SESSION)
 
-# Define a function to handle the 'rename' callback
 @Client.on_callback_query(filters.regex('rename'))
 async def rename(bot, update):
     await update.message.delete()
@@ -25,7 +24,6 @@ async def rename(bot, update):
                                     reply_to_message_id=update.message.reply_to_message.id,
                                     reply_markup=ForceReply(True))
 
-# Define the main message handler for private messages with replies
 @Client.on_message(filters.private & filters.reply)
 async def refunc(client, message):
     reply_message = message.reply_to_message
@@ -43,43 +41,32 @@ async def refunc(client, message):
             new_name = new_name + "." + extn
         await reply_message.delete()
 
-        # Use a list to store the inline keyboard buttons
         button = [
-            [InlineKeyboardButton(
-                "📁 Dᴏᴄᴜᴍᴇɴᴛ", callback_data="upload_document")]
+            [InlineKeyboardButton("📁 Dᴏᴄᴜᴍᴇɴᴛ", callback_data="upload_document")]
         ]
         if file.media in [MessageMediaType.VIDEO, MessageMediaType.DOCUMENT]:
-            button.append([InlineKeyboardButton(
-                "🎥 Vɪᴅᴇᴏ", callback_data="upload_video")])
+            button.append([InlineKeyboardButton("🎥 Vɪᴅᴇᴏ", callback_data="upload_video")])
         elif file.media == MessageMediaType.AUDIO:
-            button.append([InlineKeyboardButton(
-                "🎵 Aᴜᴅɪᴏ", callback_data="upload_audio")])
+            button.append([InlineKeyboardButton("🎵 Aᴜᴅɪᴏ", callback_data="upload_audio")])
 
-        # Use a single call to reply with both text and inline keyboard
         await message.reply(
             text=f"**Sᴇʟᴇᴄᴛ Tʜᴇ Oᴜᴛᴩᴜᴛ Fɪʟᴇ Tyᴩᴇ**\n**• Fɪʟᴇ Nᴀᴍᴇ :-**  `{new_name}`",
             reply_to_message_id=file.id,
             reply_markup=InlineKeyboardMarkup(button)
         )
 
-# Define the callback for the 'upload' buttons
 @Client.on_callback_query(filters.regex("upload"))
 async def doc(bot, update):
-
-    # Creating Directory for Metadata
     if not os.path.isdir("Metadata"):
         os.mkdir("Metadata")
 
-    # Extracting necessary information
     prefix = await db.get_prefix(update.message.chat.id)
     suffix = await db.get_suffix(update.message.chat.id)
     new_name = update.message.text
     new_filename_ = new_name.split(":-")[1].strip()
 
     try:
-        # adding prefix and suffix
         new_filename = add_prefix_suffix(new_filename_, prefix, suffix).replace("_", "")
-
     except Exception as e:
         return await update.message.edit(f"⚠️ Something went wrong can't able to set Prefix or Suffix ☹️ \n\n❄️ Contact My Creator -> @Yuuichi_Sama\nError: {e}")
 
@@ -90,7 +77,8 @@ async def doc(bot, update):
     try:
         path = await bot.download_media(message=file, file_name=file_path, progress=progress_for_pyrogram, progress_args=("\n⚠️ __**Please wait...**__\n\n❄️ **Dᴏᴡɴʟᴏᴀᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
     except Exception as e:
-        return await ms.edit(e)
+        print(f"Download Error: {e}")
+        return await ms.edit(f"Download Error: {e}")
 
     _bool_metadata = await db.get_metadata(update.message.chat.id)
 
@@ -98,7 +86,6 @@ async def doc(bot, update):
         metadata_path = f"Metadata/{new_filename}"
         metadata = await db.get_metadata_code(update.message.chat.id)
         if metadata:
-
             await ms.edit("I Fᴏᴜɴᴅ Yᴏᴜʀ Mᴇᴛᴀᴅᴀᴛᴀ\n\n__**Pʟᴇᴀsᴇ Wᴀɪᴛ...**__\n**Aᴅᴅɪɴɢ Mᴇᴛᴀᴅᴀᴛᴀ Tᴏ Fɪʟᴇ....**")
             cmd = f"""ffmpeg -i "{path}" {metadata} "{metadata_path}" """
 
@@ -126,8 +113,9 @@ async def doc(bot, update):
             duration = metadata.get('duration').seconds
         parser.close()
 
-    except:
-        pass
+    except Exception as e:
+        print(f"Metadata Extraction Error: {e}")
+
     ph_path = None
     media = getattr(file, file.media.value)
     c_caption = await db.get_caption(update.message.chat.id)
@@ -152,14 +140,13 @@ async def doc(bot, update):
                 width, height, ph_path = await fix_thumb(ph_path_)
             except Exception as e:
                 ph_path = None
-                print(e)
+                print(f"Thumbnail Error: {e}")
 
     type = update.data.split("_")[1]
 
     if media.file_size > 2000 * 1024 * 1024:
         try:
             if type == "document":
-
                 filw = await app.send_document(
                     Config.LOG_CHANNEL,
                     document=metadata_path if _bool_metadata else file_path,
@@ -174,7 +161,6 @@ async def doc(bot, update):
                 await bot.copy_message(update.from_user.id, from_chat, mg_id)
 
             elif type == "video":
-
                 filw = await app.send_video(
                     Config.LOG_CHANNEL,
                     video=metadata_path if _bool_metadata else file_path,
@@ -192,7 +178,6 @@ async def doc(bot, update):
                 await bot.copy_message(update.from_user.id, from_chat, mg_id)
 
             elif type == "audio":
-
                 filw = await app.send_audio(
                     Config.LOG_CHANNEL,
                     audio=metadata_path if _bool_metadata else file_path,
@@ -207,13 +192,12 @@ async def doc(bot, update):
                 time.sleep(2)
                 await bot.copy_message(update.from_user.id, from_chat, mg_id)
         except Exception as e:
-            print(e)
-            return await ms.edit("Error: Something went wrong!\n\nPlease Try Again Later")
+            print(f"Upload Error (Large File): {e}")
+            return await ms.edit(f"Error: Something went wrong during upload (Large File)! Error: {e}")
 
     else:
         try:
             if type == "document":
-
                 await app.send_document(
                     update.message.chat.id,
                     document=metadata_path if _bool_metadata else file_path,
@@ -223,7 +207,6 @@ async def doc(bot, update):
                     progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
 
             elif type == "video":
-
                 await app.send_video(
                     update.message.chat.id,
                     video=metadata_path if _bool_metadata else file_path,
@@ -236,7 +219,6 @@ async def doc(bot, update):
                     progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
 
             elif type == "audio":
-
                 await app.send_audio(
                     update.message.chat.id,
                     audio=metadata_path if _bool_metadata else file_path,
@@ -245,16 +227,20 @@ async def doc(bot, update):
                     thumb=ph_path,
                     progress=progress_for_pyrogram,
                     progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
-
         except Exception as e:
-            print(e)
-            return await ms.edit("Error: Something went wrong!\n\nPlease Try Again Later")
+            print(f"Upload Error: {e}")
+            return await ms.edit(f"Error: Something went wrong during upload! Error: {e}")
 
     await ms.delete()
     try:
         os.remove(file_path)
-        os.remove(ph_path)
-    except:
-        pass
+        if ph_path:
+            os.remove(ph_path)
+    except Exception as e:
+        print(f"Cleanup Error: {e}")
+
     if _bool_metadata:
-        os.remove(metadata_path)
+        try:
+            os.remove(metadata_path)
+        except Exception as e:
+            print(f"Metadata Cleanup Error: {e}")
