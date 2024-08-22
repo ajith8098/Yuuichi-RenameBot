@@ -14,13 +14,10 @@ import time
 from helper.utils import add_prefix_suffix
 from config import Config
 
-
 app = Client("test", api_id=Config.STRING_API_ID,
              api_hash=Config.STRING_API_HASH, session_string=Config.STRING_SESSION)
 
 # Define a function to handle the 'rename' callback
-
-
 @Client.on_callback_query(filters.regex('rename'))
 async def rename(bot, update):
     await update.message.delete()
@@ -29,13 +26,11 @@ async def rename(bot, update):
                                     reply_markup=ForceReply(True))
 
 # Define the main message handler for private messages with replies
-
-
 @Client.on_message(filters.private & filters.reply)
 async def refunc(client, message):
     reply_message = message.reply_to_message
     if isinstance(reply_message.reply_markup, ForceReply):
-        new_name = message.text
+        new_name = message.text.replace("_", "")  # Remove underscores
         await message.delete()
         msg = await client.get_messages(message.chat.id, reply_message.id)
         file = msg.reply_to_message
@@ -68,8 +63,6 @@ async def refunc(client, message):
         )
 
 # Define the callback for the 'upload' buttons
-
-
 @Client.on_callback_query(filters.regex("upload"))
 async def doc(bot, update):
 
@@ -81,11 +74,11 @@ async def doc(bot, update):
     prefix = await db.get_prefix(update.message.chat.id)
     suffix = await db.get_suffix(update.message.chat.id)
     new_name = update.message.text
-    new_filename_ = new_name.split(":-")[1]
+    new_filename_ = new_name.split(":-")[1].strip()
 
     try:
         # adding prefix and suffix
-        new_filename = add_prefix_suffix(new_filename_, prefix, suffix)
+        new_filename = add_prefix_suffix(new_filename_, prefix, suffix).replace("_", "")
 
     except Exception as e:
         return await update.message.edit(f"⚠️ Something went wrong can't able to set Prefix or Suffix ☹️ \n\n❄️ Contact My Creator -> @Yuuichi_Sama\nError: {e}")
@@ -145,7 +138,7 @@ async def doc(bot, update):
             caption = c_caption.format(filename=new_filename, filesize=humanbytes(
                 media.file_size), duration=convert(duration))
         except Exception as e:
-            return await ms.edit(text=f"Yᴏᴜʀ Cᴀᴩᴛɪᴏɴ Eʀʀᴏʀ Exᴄᴇᴩᴛ Kᴇyᴡᴏʀᴅ Aʀɢᴜᴍᴇɴᴛ ●> ({e})")
+            return await ms.edit(text=f"Yᴏᴜʀ Cᴀᴩᴛɪᴏɴ Eʀʀᴏʀ Exᴄᴇᴩᴛ Kᴇʏᴡᴏʀᴅ Aʀɢᴜᴍᴇɴᴛ ●> ({e})")
     else:
         caption = f"**{new_filename}**"
 
@@ -179,34 +172,17 @@ async def doc(bot, update):
                 mg_id = filw.id
                 time.sleep(2)
                 await bot.copy_message(update.from_user.id, from_chat, mg_id)
-                await ms.delete()
-                await bot.delete_messages(from_chat, mg_id)
 
             elif type == "video":
+
                 filw = await app.send_video(
-                    update.message.chat.id,
+                    Config.LOG_CHANNEL,
                     video=metadata_path if _bool_metadata else file_path,
-                    caption=caption,
-                    thumb=ph_path,
+                    duration=duration,
                     width=width,
                     height=height,
-                    duration=duration,
-                    progress=progress_for_pyrogram,
-                    progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
-
-                from_chat = filw.chat.id
-                mg_id = filw.id
-                time.sleep(2)
-                await bot.copy_message(update.from_user.id, from_chat, mg_id)
-                await ms.delete()
-                await bot.delete_messages(from_chat, mg_id)
-            elif type == "audio":
-                filw = await app.send_audio(
-                    update.message.chat.id,
-                    audio=metadata_path if _bool_metadata else file_path,
                     caption=caption,
                     thumb=ph_path,
-                    duration=duration,
                     progress=progress_for_pyrogram,
                     progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
 
@@ -214,65 +190,71 @@ async def doc(bot, update):
                 mg_id = filw.id
                 time.sleep(2)
                 await bot.copy_message(update.from_user.id, from_chat, mg_id)
-                await ms.delete()
-                await bot.delete_messages(from_chat, mg_id)
 
+            elif type == "audio":
+
+                filw = await app.send_audio(
+                    Config.LOG_CHANNEL,
+                    audio=metadata_path if _bool_metadata else file_path,
+                    duration=duration,
+                    caption=caption,
+                    thumb=ph_path,
+                    progress=progress_for_pyrogram,
+                    progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
+
+                from_chat = filw.chat.id
+                mg_id = filw.id
+                time.sleep(2)
+                await bot.copy_message(update.from_user.id, from_chat, mg_id)
         except Exception as e:
-            os.remove(file_path)
-            if ph_path:
-                os.remove(ph_path)
-            if metadata_path:
-                os.remove(metadata_path)
-            if path:
-                os.remove(path)
-            return await ms.edit(f" Eʀʀᴏʀ {e}")
+            print(e)
+            return await ms.edit("Error: Something went wrong!\n\nPlease Try Again Later")
 
     else:
-
         try:
             if type == "document":
-                await bot.send_document(
+
+                await app.send_document(
                     update.message.chat.id,
                     document=metadata_path if _bool_metadata else file_path,
                     thumb=ph_path,
                     caption=caption,
                     progress=progress_for_pyrogram,
                     progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
+
             elif type == "video":
-                await bot.send_video(
+
+                await app.send_video(
                     update.message.chat.id,
                     video=metadata_path if _bool_metadata else file_path,
-                    caption=caption,
-                    thumb=ph_path,
+                    duration=duration,
                     width=width,
                     height=height,
-                    duration=duration,
-                    progress=progress_for_pyrogram,
-                    progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
-            elif type == "audio":
-                await bot.send_audio(
-                    update.message.chat.id,
-                    audio=metadata_path if _bool_metadata else file_path,
                     caption=caption,
                     thumb=ph_path,
-                    duration=duration,
                     progress=progress_for_pyrogram,
                     progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
+
+            elif type == "audio":
+
+                await app.send_audio(
+                    update.message.chat.id,
+                    audio=metadata_path if _bool_metadata else file_path,
+                    duration=duration,
+                    caption=caption,
+                    thumb=ph_path,
+                    progress=progress_for_pyrogram,
+                    progress_args=("⚠️ __**Please wait...**__\n\n🌨️ **Uᴩʟᴏᴅ Sᴛᴀʀᴛᴇᴅ....**", ms, time.time()))
+
         except Exception as e:
-            os.remove(file_path)
-            if ph_path:
-                os.remove(ph_path)
-            if metadata_path:
-                os.remove(metadata_path)
-            if path:
-                os.remove(path)
-            return await ms.edit(f" Eʀʀᴏʀ {e}")
+            print(e)
+            return await ms.edit("Error: Something went wrong!\n\nPlease Try Again Later")
 
     await ms.delete()
-
-    if ph_path:
-        os.remove(ph_path)
-    if file_path:
+    try:
         os.remove(file_path)
-    if metadata_path:
+        os.remove(ph_path)
+    except:
+        pass
+    if _bool_metadata:
         os.remove(metadata_path)
